@@ -8,12 +8,15 @@ const cors = require("cors");
 const app = express();
 
 // Middleware
+console.log("FRONTEND_URL:", process.env.FRONTEND_URL);
+
 app.use(
   cors({
     origin: process.env.FRONTEND_URL || "http://localhost:3000",
     credentials: true,
   })
 );
+
 app.use(express.json());
 
 // MongoDB Connection
