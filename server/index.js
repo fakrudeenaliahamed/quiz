@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
+const e = require("express");
 
 const app = express();
 
@@ -33,6 +34,12 @@ const User = mongoose.model(
     password: { type: String, required: true },
     role: { type: String, enum: ["user", "admin"], default: "user" },
     createdAt: { type: Date, default: Date.now },
+    assignedUsers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
   })
 );
 
@@ -48,6 +55,7 @@ const Quiz = mongoose.model(
         options: [{ type: String, required: true }],
         correctAnswer: { type: String, required: true },
         points: { type: Number, default: 1 },
+        explanation: String,
       },
     ],
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
@@ -222,6 +230,19 @@ app.get("/api/scores", authenticate, async (req, res) => {
       .populate("quiz", "title category")
       .sort({ createdAt: -1 });
     res.json(scores);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.put("/api/quizzes/:id/assign", authenticate, isAdmin, async (req, res) => {
+  try {
+    const quiz = await Quiz.findByIdAndUpdate(
+      req.params.id,
+      { assignedUsers: req.body.userIds },
+      { new: true }
+    ).populate("assignedUsers", "username");
+    res.json(quiz);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
