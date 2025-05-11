@@ -127,3 +127,43 @@ body {
     grid-template-columns: 1fr;
   }
 }
+.correct-marker {
+  color: #28a745;
+  font-weight: bold;
+  margin-left: 8px;
+}
+
+.option.correct {
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+  color: #155724;
+}
+
+.option.incorrect {
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+  color: #721c24;
+}
+
+.option.show-correct {
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+  color: #155724;
+  font-weight: bold;
+}
+
+.feedback.correct {
+  color: #155724;
+  background-color: #d4edda;
+  padding: 10px;
+  border-radius: 5px;
+  margin: 10px 0;
+}
+
+.feedback.incorrect {
+  color: #721c24;
+  background-color: #f8d7da;
+  padding: 10px;
+  border-radius: 5px;
+  margin: 10px 0;
+}

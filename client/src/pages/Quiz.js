@@ -88,6 +88,8 @@ function Quiz() {
 
   const question = quiz.questions[currentQuestion];
   const hasSelectedAnswer = selectedAnswers[currentQuestion] !== undefined;
+  const selectedAnswer = selectedAnswers[currentQuestion];
+  const correctAnswer = question.correctAnswer;
 
   return (
     <div className="quiz-container">
@@ -102,21 +104,22 @@ function Quiz() {
             <div
               key={index}
               className={`option ${
-                selectedAnswers[currentQuestion] === option ? "selected" : ""
+                selectedAnswer === option ? "selected" : ""
               } ${
-                selectedAnswers[currentQuestion] === option
-                  ? option === question.correctAnswer
+                selectedAnswer === option
+                  ? option === correctAnswer
                     ? "correct"
                     : "incorrect"
                   : ""
               } ${
-                showFeedback && option === question.correctAnswer
-                  ? "show-correct"
-                  : ""
+                showFeedback && option === correctAnswer ? "show-correct" : ""
               }`}
               onClick={() => !hasSelectedAnswer && handleAnswerSelect(option)}
             >
               {option}
+              {showFeedback && option === correctAnswer && (
+                <span className="correct-marker"> (Correct Answer)</span>
+              )}
             </div>
           ))}
         </div>
@@ -127,6 +130,11 @@ function Quiz() {
           className={`feedback ${lastAnswerCorrect ? "correct" : "incorrect"}`}
         >
           <p>{lastAnswerCorrect ? "✓ Correct!" : "✗ Incorrect"}</p>
+          {!lastAnswerCorrect && (
+            <p>
+              The correct answer is: <strong>{correctAnswer}</strong>
+            </p>
+          )}
           <p>{question.explanation || "No explanation provided."}</p>
         </div>
       )}
