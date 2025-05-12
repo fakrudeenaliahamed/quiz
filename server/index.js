@@ -60,6 +60,7 @@ const Quiz = mongoose.model(
     ],
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     createdAt: { type: Date, default: Date.now },
+    authorizedUsers: [{ type: String }], // Array of usernames
   })
 );
 
@@ -214,6 +215,7 @@ app.post("/api/quizzes", authenticate, isAdmin, async (req, res) => {
       category,
       questions,
       createdBy: req.user._id,
+      authorizedUsers: req.body.authorizedUsers || [],
     });
 
     await quiz.save();

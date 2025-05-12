@@ -74,6 +74,8 @@ function QuizNew() {
     e.preventDefault();
     if (!isValidJson) return;
 
+    console.log("Parsed Data:", parsedData);
+
     try {
       await axios.post("/api/quizzes", {
         ...parsedData,

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import axios from "axios";
-import { Link, useNavigate } from "react-router-dom"; // Added useNavigate
+import { Link, useNavigate } from "react-router-dom";
 
 function Dashboard() {
   const { user, logout } = useAuth();
@@ -12,8 +12,8 @@ function Dashboard() {
 
   const handleLogout = async () => {
     try {
-      await logout(); // Call your logout function
-      navigate("/"); // Redirect to home page after logout
+      await logout();
+      navigate("/");
     } catch (err) {
       console.error("Failed to logout", err);
     }
@@ -26,7 +26,17 @@ function Dashboard() {
           axios.get("/api/quizzes"),
           axios.get("/api/scores"),
         ]);
-        setQuizzes(quizzesRes.data);
+
+        let allQuizzes = quizzesRes.data;
+
+        // Filter quizzes based on user role
+        if (user?.role !== "admin") {
+          allQuizzes = allQuizzes.filter((quiz) =>
+            quiz.authorizedUsers.includes(user.username)
+          );
+        }
+
+        setQuizzes(allQuizzes);
         setScores(scoresRes.data);
       } catch (err) {
         console.error("Failed to fetch data", err);
@@ -34,8 +44,9 @@ function Dashboard() {
         setLoading(false);
       }
     };
+
     fetchData();
-  }, []);
+  }, [user]);
 
   if (loading) return <div>Loading dashboard...</div>;
 
