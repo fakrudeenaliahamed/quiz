@@ -225,6 +225,30 @@ app.post("/api/quizzes", authenticate, isAdmin, async (req, res) => {
   }
 });
 
+app.put("/api/quizzes/:id", authenticate, isAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { questions } = req.body;
+
+    if (!Array.isArray(questions) || questions.length === 0) {
+      return res.status(400).json({ error: "Questions are required" });
+    }
+
+    const quiz = await Quiz.findById(id);
+    if (!quiz) {
+      return res.status(404).json({ error: "Quiz not found" });
+    }
+
+    // Append new questions to the existing quiz
+    quiz.questions.push(...questions);
+    await quiz.save();
+
+    res.json(quiz);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Score Routes
 app.get("/api/scores", authenticate, async (req, res) => {
   try {
@@ -252,35 +276,23 @@ app.put("/api/quizzes/:id/assign", authenticate, isAdmin, async (req, res) => {
 
 app.post("/api/scores", authenticate, async (req, res) => {
   try {
-    const { quizId, answers } = req.body;
+    const { quizId, score, total, answers } = req.body;
 
     const quiz = await Quiz.findById(quizId);
     if (!quiz) {
       return res.status(404).json({ error: "Quiz not found" });
     }
 
-    let score = 0;
-    const detailedAnswers = quiz.questions.map((question) => {
-      const userAnswer = answers.find(
-        (a) => a.questionId === question._id.toString()
-      );
-      const isCorrect =
-        userAnswer && userAnswer.selectedAnswer === question.correctAnswer;
-      if (isCorrect) score += question.points || 1;
-
-      return {
-        questionId: question._id,
-        selectedAnswer: userAnswer?.selectedAnswer || "",
-        isCorrect,
-      };
-    });
-
     const newScore = new Score({
       user: req.user._id,
       quiz: quiz._id,
       score,
-      total: quiz.questions.reduce((sum, q) => sum + (q.points || 1), 0),
-      answers: detailedAnswers,
+      total: total,
+      answers: answers.map((answer, index) => ({
+        questionId: quiz.questions[index]._id,
+        selectedAnswer: answer,
+        isCorrect: answer === quiz.questions[index].correctAnswer,
+      })),
     });
 
     await newScore.save();

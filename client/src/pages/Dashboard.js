@@ -92,7 +92,7 @@ function Dashboard() {
                   <td>
                     {score.score}/{score.total}
                   </td>
-                  <td>{new Date(score.date).toLocaleDateString()}</td>
+                  <td>{new Date(score.createdAt).toLocaleDateString()}</td>
                 </tr>
               ))}
             </tbody>

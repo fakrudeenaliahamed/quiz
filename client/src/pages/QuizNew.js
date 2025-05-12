@@ -1,5 +1,5 @@
 // client/src/pages/QuizNew.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
@@ -9,8 +9,22 @@ function QuizNew() {
   const [error, setError] = useState("");
   const [isValidJson, setIsValidJson] = useState(false);
   const [parsedData, setParsedData] = useState(null);
+  const [quizzes, setQuizzes] = useState([]); // State to store quizzes
   const navigate = useNavigate();
   const { user } = useAuth();
+
+  useEffect(() => {
+    const fetchQuizzes = async () => {
+      try {
+        const response = await axios.get("/api/quizzes");
+        setQuizzes(response.data);
+      } catch (err) {
+        console.error("Failed to fetch quizzes", err);
+      }
+    };
+
+    fetchQuizzes();
+  }, []);
 
   const validateJson = (jsonString) => {
     try {
@@ -77,19 +91,29 @@ function QuizNew() {
     console.log("Parsed Data:", parsedData);
 
     try {
-      await axios.post("/api/quizzes", {
-        ...parsedData,
-        createdBy: user._id,
-      });
+      if (parsedData._id) {
+        // If _id exists, append new questions to the existing quiz
+        const response = await axios.put(`/api/quizzes/${parsedData._id}`, {
+          questions: parsedData.questions,
+        });
+        console.log("Quiz updated:", response.data);
+      } else {
+        // If _id does not exist, create a new quiz
+        const response = await axios.post("/api/quizzes", {
+          ...parsedData,
+          createdBy: user._id,
+        });
+        console.log("Quiz created:", response.data);
+      }
       navigate("/dashboard");
     } catch (err) {
-      setError(err.response?.data?.error || "Failed to create quiz");
+      setError(err.response?.data?.error || "Failed to create or update quiz");
     }
   };
 
   return (
     <div className="quiz-form">
-      <h2>Create New Quiz (JSON Input)</h2>
+      <h2>Create or Update Quiz (JSON Input)</h2>
 
       <div className="form-group">
         <label>Paste your quiz JSON:</label>
@@ -161,8 +185,34 @@ function QuizNew() {
         disabled={!isValidJson}
         className="btn btn-primary"
       >
-        Create Quiz
+        {parsedData?._id ? "Update Quiz" : "Create Quiz"}
       </button>
+      {/* Table of Quizzes */}
+      <div className="quiz-table-section">
+        <h3>Existing Quizzes</h3>
+        {quizzes.length > 0 ? (
+          <table className="quiz-table">
+            <thead>
+              <tr>
+                <th>Quiz ID</th>
+                <th>Name</th>
+                <th>Created Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {quizzes.map((quiz) => (
+                <tr key={quiz._id}>
+                  <td>{quiz._id}</td>
+                  <td>{quiz.title}</td>
+                  <td>{new Date(quiz.createdAt).toLocaleDateString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p>No quizzes available.</p>
+        )}
+      </div>
     </div>
   );
 }

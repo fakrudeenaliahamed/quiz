@@ -6,6 +6,7 @@ function Quiz() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [quiz, setQuiz] = useState(null);
+  const [filteredQuestions, setFilteredQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState([]);
   const [score, setScore] = useState(0);
@@ -17,7 +18,18 @@ function Quiz() {
     const fetchQuiz = async () => {
       try {
         const response = await axios.get(`/api/quizzes/${id}`);
-        setQuiz(response.data);
+        const quizData = response.data;
+
+        // If there are more than 20 questions, select 20 random ones
+        if (quizData.questions && quizData.questions.length > 20) {
+          const shuffled = [...quizData.questions].sort(
+            () => 0.5 - Math.random()
+          );
+          quizData.questions = shuffled.slice(0, 20);
+        }
+
+        setQuiz(quizData);
+        setFilteredQuestions(quizData.questions);
       } catch (err) {
         console.error("Failed to fetch quiz", err);
       }
@@ -31,14 +43,15 @@ function Quiz() {
     setSelectedAnswers(newAnswers);
 
     // Show feedback immediately
-    const isCorrect = answer === quiz.questions[currentQuestion].correctAnswer;
+    const isCorrect =
+      answer === filteredQuestions[currentQuestion].correctAnswer;
     setLastAnswerCorrect(isCorrect);
     setShowFeedback(true);
   };
 
   const handleNext = () => {
     setShowFeedback(false);
-    if (currentQuestion < quiz.questions.length - 1) {
+    if (currentQuestion < filteredQuestions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
     } else {
       calculateScore();
@@ -48,7 +61,7 @@ function Quiz() {
 
   const calculateScore = () => {
     let correct = 0;
-    quiz.questions.forEach((question, index) => {
+    filteredQuestions.forEach((question, index) => {
       if (selectedAnswers[index] === question.correctAnswer) {
         correct++;
       }
@@ -61,7 +74,7 @@ function Quiz() {
       await axios.post("/api/scores", {
         quizId: quiz._id,
         score,
-        total: quiz.questions.length,
+        total: filteredQuestions.length,
         answers: selectedAnswers,
       });
       navigate("/dashboard");
@@ -77,7 +90,7 @@ function Quiz() {
       <div className="quiz-results">
         <h2>Quiz Completed!</h2>
         <p>
-          Your score: {score}/{quiz.questions.length}
+          Your score: {score}/{filteredQuestions.length}
         </p>
         <button onClick={submitQuiz} className="btn btn-primary">
           Save Results
@@ -86,7 +99,7 @@ function Quiz() {
     );
   }
 
-  const question = quiz.questions[currentQuestion];
+  const question = filteredQuestions[currentQuestion];
   const hasSelectedAnswer = selectedAnswers[currentQuestion] !== undefined;
   const selectedAnswer = selectedAnswers[currentQuestion];
   const correctAnswer = question.correctAnswer;
@@ -94,8 +107,13 @@ function Quiz() {
   return (
     <div className="quiz-container">
       <h2>{quiz.title}</h2>
+      {quiz.questions.length > 20 && (
+        <div className="quiz-notice">
+          (Showing 20 random questions out of {quiz.questions.length})
+        </div>
+      )}
       <div className="quiz-progress">
-        Question {currentQuestion + 1} of {quiz.questions.length}
+        Question {currentQuestion + 1} of {filteredQuestions.length}
       </div>
       <div className="question">
         <h3>{question.questionText}</h3>
@@ -141,7 +159,7 @@ function Quiz() {
 
       {hasSelectedAnswer && (
         <button onClick={handleNext} className="btn btn-primary">
-          {currentQuestion === quiz.questions.length - 1
+          {currentQuestion === filteredQuestions.length - 1
             ? "Finish Quiz"
             : "Next Question"}
         </button>
