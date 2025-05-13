@@ -86,6 +86,30 @@ const Score = mongoose.model(
   })
 );
 
+// Utility function for retrying operations with transactions
+const executeWithRetry = async (operation, maxRetries = 10) => {
+  let retries = 0;
+  while (retries < maxRetries) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    try {
+      const result = await operation(session);
+      await session.commitTransaction();
+      return result; // Return the result if successful
+    } catch (err) {
+      await session.abortTransaction();
+      //sleep for a short time before retrying
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      retries++;
+      if (retries >= maxRetries) {
+        throw err; // Rethrow the error after max retries
+      }
+    } finally {
+      session.endSession();
+    }
+  }
+};
+
 // Authentication Middleware
 const authenticate = async (req, res, next) => {
   try {
@@ -206,9 +230,6 @@ app.get("/api/quizzes/:id", authenticate, async (req, res) => {
 });
 
 app.post("/api/quizzes", authenticate, isAdmin, async (req, res) => {
-  const session = await mongoose.startSession(); // Start a session for the transaction
-  session.startTransaction(); // Start the transaction
-
   try {
     const { title, description, category, questions } = req.body;
 
@@ -217,38 +238,35 @@ app.post("/api/quizzes", authenticate, isAdmin, async (req, res) => {
       return res.status(400).json({ error: "Invalid quiz data" });
     }
 
-    // Check if a quiz with the same title already exists
-    let quiz = await Quiz.findOne({ title }).session(session);
+    // Retry logic for creating or updating a quiz
+    const result = await executeWithRetry(async (session) => {
+      // Check if a quiz with the same title already exists
+      let quiz = await Quiz.findOne({ title }).session(session);
 
-    if (quiz) {
-      // If the quiz exists, append new questions
-      quiz.questions.push(...questions);
-      await quiz.save({ session });
-      await session.commitTransaction(); // Commit the transaction
-      return res.json({
-        message: "Questions appended to the existing quiz",
-        quiz,
+      if (quiz) {
+        // If the quiz exists, append new questions
+        quiz.questions.push(...questions);
+        await quiz.save({ session });
+        return { message: "Questions appended to the existing quiz", quiz };
+      }
+
+      // If the quiz does not exist, create a new one
+      quiz = new Quiz({
+        title,
+        description,
+        category,
+        questions,
+        createdBy: req.user._id,
+        authorizedUsers: req.body.authorizedUsers || [],
       });
-    }
 
-    // If the quiz does not exist, create a new one
-    quiz = new Quiz({
-      title,
-      description,
-      category,
-      questions,
-      createdBy: req.user._id,
-      authorizedUsers: req.body.authorizedUsers || [],
+      await quiz.save({ session });
+      return { message: "New quiz created successfully", quiz };
     });
 
-    await quiz.save({ session });
-    await session.commitTransaction(); // Commit the transaction
-    res.status(201).json({ message: "New quiz created successfully", quiz });
+    res.status(201).json(result);
   } catch (err) {
-    await session.abortTransaction(); // Roll back the transaction on error
     res.status(500).json({ error: err.message });
-  } finally {
-    session.endSession(); // End the session
   }
 });
 
