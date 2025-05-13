@@ -209,11 +209,23 @@ app.post("/api/quizzes", authenticate, isAdmin, async (req, res) => {
   try {
     const { title, description, category, questions } = req.body;
 
+    // Validate input
     if (!title || !category || !questions || !Array.isArray(questions)) {
       return res.status(400).json({ error: "Invalid quiz data" });
     }
 
-    const quiz = new Quiz({
+    // Check if a quiz with the same title already exists
+    let quiz = await Quiz.findOne({ title });
+
+    if (quiz) {
+      // If the quiz exists, append new questions
+      quiz.questions.push(...questions);
+      await quiz.save();
+      return res.json({ message: "Questions appended to the existing quiz", quiz });
+    }
+
+    // If the quiz does not exist, create a new one
+    quiz = new Quiz({
       title,
       description,
       category,
@@ -223,7 +235,7 @@ app.post("/api/quizzes", authenticate, isAdmin, async (req, res) => {
     });
 
     await quiz.save();
-    res.status(201).json(quiz);
+    res.status(201).json({ message: "New quiz created successfully", quiz });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -353,31 +365,6 @@ const initializeAdmin = async () => {
     }
   } catch (err) {
     console.error("Error creating admin user:", err);
-  }
-};
-
-// Create new quiz (admin only)
-app.post("/api/quizzes", authenticate, isAdmin, async (req, res) => {
-  try {
-    const { title, description, category, questions } = req.body;
-
-    // Validate input
-    if (!title || !category || !questions || !Array.isArray(questions)) {
-      return res.status(400).json({ error: "Invalid quiz data" });
-    }
-
-    const quiz = new Quiz({
-      title,
-      description,
-      category,
-      questions,
-      createdBy: req.user._id,
-    });
-
-    await quiz.save();
-    res.status(201).json(quiz);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
   }
 });
 
