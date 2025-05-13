@@ -19,10 +19,10 @@ app.use(
   cors({
     origin: process.env.FRONTEND_URL || "http://localhost:3000",
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
-
-app.use(express.json());
 
 // MongoDB Connection
 mongoose
@@ -221,7 +221,10 @@ app.post("/api/quizzes", authenticate, isAdmin, async (req, res) => {
       // If the quiz exists, append new questions
       quiz.questions.push(...questions);
       await quiz.save();
-      return res.json({ message: "Questions appended to the existing quiz", quiz });
+      return res.json({
+        message: "Questions appended to the existing quiz",
+        quiz,
+      });
     }
 
     // If the quiz does not exist, create a new one
@@ -366,7 +369,7 @@ const initializeAdmin = async () => {
   } catch (err) {
     console.error("Error creating admin user:", err);
   }
-});
+};
 
 // Start Server
 const PORT = process.env.PORT || 5000;
@@ -414,14 +417,6 @@ app.post("/api/init-quizzes", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-app.use(
-  cors({
-    origin: true, // Allow all origins during development
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
 app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
   await initializeAdmin();
