@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import Navbar from "../components/Navbar";
 
 function Quiz() {
   const { id } = useParams();
@@ -105,65 +106,70 @@ function Quiz() {
   const correctAnswer = question.correctAnswer;
 
   return (
-    <div className="quiz-container">
-      <h2>{quiz.title}</h2>
-      {quiz.questions.length > 20 && (
-        <div className="quiz-notice">
-          (Showing 20 random questions out of {quiz.questions.length})
+    <div>
+      <Navbar />
+      <div className="quiz-container">
+        <h2>{quiz.title}</h2>
+        {quiz.questions.length > 20 && (
+          <div className="quiz-notice">
+            (Showing 20 random questions out of {quiz.questions.length})
+          </div>
+        )}
+        <div className="quiz-progress">
+          Question {currentQuestion + 1} of {filteredQuestions.length}
         </div>
-      )}
-      <div className="quiz-progress">
-        Question {currentQuestion + 1} of {filteredQuestions.length}
-      </div>
-      <div className="question">
-        <h3>{question.questionText}</h3>
-        <div className="options">
-          {question.options.map((option, index) => (
-            <div
-              key={index}
-              className={`option ${
-                selectedAnswer === option ? "selected" : ""
-              } ${
-                selectedAnswer === option
-                  ? option === correctAnswer
-                    ? "correct"
-                    : "incorrect"
-                  : ""
-              } ${
-                showFeedback && option === correctAnswer ? "show-correct" : ""
-              }`}
-              onClick={() => !hasSelectedAnswer && handleAnswerSelect(option)}
-            >
-              {option}
-              {showFeedback && option === correctAnswer && (
-                <span className="correct-marker"> (Correct Answer)</span>
-              )}
-            </div>
-          ))}
+        <div className="question">
+          <h3>{question.questionText}</h3>
+          <div className="options">
+            {question.options.map((option, index) => (
+              <div
+                key={index}
+                className={`option ${
+                  selectedAnswer === option ? "selected" : ""
+                } ${
+                  selectedAnswer === option
+                    ? option === correctAnswer
+                      ? "correct"
+                      : "incorrect"
+                    : ""
+                } ${
+                  showFeedback && option === correctAnswer ? "show-correct" : ""
+                }`}
+                onClick={() => !hasSelectedAnswer && handleAnswerSelect(option)}
+              >
+                {option}
+                {showFeedback && option === correctAnswer && (
+                  <span className="correct-marker"> (Correct Answer)</span>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
 
-      {showFeedback && (
-        <div
-          className={`feedback ${lastAnswerCorrect ? "correct" : "incorrect"}`}
-        >
-          <p>{lastAnswerCorrect ? "✓ Correct!" : "✗ Incorrect"}</p>
-          {!lastAnswerCorrect && (
-            <p>
-              The correct answer is: <strong>{correctAnswer}</strong>
-            </p>
-          )}
-          <p>{question.explanation || "No explanation provided."}</p>
-        </div>
-      )}
+        {showFeedback && (
+          <div
+            className={`feedback ${
+              lastAnswerCorrect ? "correct" : "incorrect"
+            }`}
+          >
+            <p>{lastAnswerCorrect ? "✓ Correct!" : "✗ Incorrect"}</p>
+            {!lastAnswerCorrect && (
+              <p>
+                The correct answer is: <strong>{correctAnswer}</strong>
+              </p>
+            )}
+            <p>{question.explanation || "No explanation provided."}</p>
+          </div>
+        )}
 
-      {hasSelectedAnswer && (
-        <button onClick={handleNext} className="btn btn-primary">
-          {currentQuestion === filteredQuestions.length - 1
-            ? "Finish Quiz"
-            : "Next Question"}
-        </button>
-      )}
+        {hasSelectedAnswer && (
+          <button onClick={handleNext} className="btn btn-primary">
+            {currentQuestion === filteredQuestions.length - 1
+              ? "Finish Quiz"
+              : "Next Question"}
+          </button>
+        )}
+      </div>
     </div>
   );
 }

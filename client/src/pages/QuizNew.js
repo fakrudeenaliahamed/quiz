@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
+import Navbar from "../components/Navbar";
 
 function QuizNew() {
   const [jsonInput, setJsonInput] = useState("");
@@ -123,15 +124,17 @@ function QuizNew() {
   };
 
   return (
-    <div className="quiz-form">
-      <h2>Create or Update Quiz (JSON Input)</h2>
+    <div>
+      <Navbar />
+      <div className="quiz-form">
+        <h2>Create or Update Quiz (JSON Input)</h2>
 
-      <div className="form-group">
-        <label>Paste your quiz JSON:</label>
-        <textarea
-          value={jsonInput}
-          onChange={handleJsonChange}
-          placeholder={`Paste your quiz data in this format:
+        <div className="form-group">
+          <label>Paste your quiz JSON:</label>
+          <textarea
+            value={jsonInput}
+            onChange={handleJsonChange}
+            placeholder={`Paste your quiz data in this format:
 {
   "title": "Quiz Title",
   "description": "Optional description",
@@ -145,84 +148,86 @@ function QuizNew() {
     }
   ]
 }`}
-          rows={20}
-          style={{ fontFamily: "monospace", whiteSpace: "pre" }}
-        />
-      </div>
-
-      {error && <div className="alert alert-danger">{error}</div>}
-
-      {isValidJson && (
-        <div className="preview-section">
-          <h3>Preview</h3>
-          <div className="preview-content">
-            <h4>{parsedData.title}</h4>
-            <p>
-              <strong>Category:</strong> {parsedData.category}
-            </p>
-            {parsedData.description && <p>{parsedData.description}</p>}
-
-            <h5>Questions:</h5>
-            <ul>
-              {parsedData.questions.map((q, i) => (
-                <li key={i}>
-                  <p>
-                    <strong>Q{i + 1}:</strong> {q.questionText} ({q.points || 1}{" "}
-                    point{q.points !== 1 ? "s" : ""})
-                  </p>
-                  <ul>
-                    {q.options.map((opt, j) => (
-                      <li
-                        key={j}
-                        style={{
-                          fontWeight:
-                            opt === q.correctAnswer ? "bold" : "normal",
-                          color: opt === q.correctAnswer ? "green" : "inherit",
-                        }}
-                      >
-                        {opt}
-                      </li>
-                    ))}
-                  </ul>
-                </li>
-              ))}
-            </ul>
-          </div>
+            rows={20}
+            style={{ fontFamily: "monospace", whiteSpace: "pre" }}
+          />
         </div>
-      )}
 
-      <button
-        onClick={handleSubmit}
-        disabled={!isValidJson}
-        className="btn btn-primary"
-      >
-        {parsedData?._id ? "Update Quiz" : "Create Quiz"}
-      </button>
-      {/* Table of Quizzes */}
-      <div className="quiz-table-section">
-        <h3>Existing Quizzes</h3>
-        {quizzes.length > 0 ? (
-          <table className="quiz-table">
-            <thead>
-              <tr>
-                <th>Quiz ID</th>
-                <th>Name</th>
-                <th>Created Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {quizzes.map((quiz) => (
-                <tr key={quiz._id}>
-                  <td>{quiz._id}</td>
-                  <td>{quiz.title}</td>
-                  <td>{new Date(quiz.createdAt).toLocaleDateString()}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <p>No quizzes available.</p>
+        {error && <div className="alert alert-danger">{error}</div>}
+
+        {isValidJson && (
+          <div className="preview-section">
+            <h3>Preview</h3>
+            <div className="preview-content">
+              <h4>{parsedData.title}</h4>
+              <p>
+                <strong>Category:</strong> {parsedData.category}
+              </p>
+              {parsedData.description && <p>{parsedData.description}</p>}
+
+              <h5>Questions:</h5>
+              <ul>
+                {parsedData.questions.map((q, i) => (
+                  <li key={i}>
+                    <p>
+                      <strong>Q{i + 1}:</strong> {q.questionText} (
+                      {q.points || 1} point{q.points !== 1 ? "s" : ""})
+                    </p>
+                    <ul>
+                      {q.options.map((opt, j) => (
+                        <li
+                          key={j}
+                          style={{
+                            fontWeight:
+                              opt === q.correctAnswer ? "bold" : "normal",
+                            color:
+                              opt === q.correctAnswer ? "green" : "inherit",
+                          }}
+                        >
+                          {opt}
+                        </li>
+                      ))}
+                    </ul>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         )}
+
+        <button
+          onClick={handleSubmit}
+          disabled={!isValidJson}
+          className="btn btn-primary"
+        >
+          {parsedData?._id ? "Update Quiz" : "Create Quiz"}
+        </button>
+        {/* Table of Quizzes */}
+        <div className="quiz-table-section">
+          <h3>Existing Quizzes</h3>
+          {quizzes.length > 0 ? (
+            <table className="quiz-table">
+              <thead>
+                <tr>
+                  <th>Quiz ID</th>
+                  <th>Name</th>
+                  <th>Created Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {quizzes.map((quiz) => (
+                  <tr key={quiz._id}>
+                    <td>{quiz._id}</td>
+                    <td>{quiz.title}</td>
+                    <td>{new Date(quiz.createdAt).toLocaleDateString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <p>No quizzes available.</p>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
+import Navbar from "../components/Navbar";
 
 function Dashboard() {
   const { user, logout } = useAuth();
@@ -68,74 +69,77 @@ function Dashboard() {
   if (loading) return <div>Loading dashboard...</div>;
 
   return (
-    <div className="dashboard">
-      <div className="header">
-        <h1>Dashboard</h1>
-        <button onClick={handleLogout} className="btn btn-secondary">
-          Logout
-        </button>
-      </div>
-
-      <div className="quizzes-section">
-        <h2>Available Quizzes</h2>
-        <div className="quiz-list">
-          {quizzes.map((quiz) => (
-            <div key={quiz._id} className="quiz-card">
-              <h3>{quiz.title}</h3>
-              <p>{quiz.questions.length} questions</p>
-              <Link to={`/quiz/${quiz._id}`} className="btn btn-primary">
-                Start Quiz
-              </Link>
-              {user?.role === "admin" && (
-                <button
-                  onClick={() => handleDeleteQuiz(quiz._id)}
-                  className="btn btn-danger"
-                  style={{ marginLeft: "10px" }}
-                >
-                  Delete
-                </button>
-              )}
-            </div>
-          ))}
+    <div>
+      <Navbar />
+      <div className="dashboard">
+        <div className="header">
+          <h1>Dashboard</h1>
+          <button onClick={handleLogout} className="btn btn-secondary">
+            Logout
+          </button>
         </div>
-      </div>
 
-      <div className="scores-section">
-        <h2>Your Scores</h2>
-        {scores.length > 0 ? (
-          <table className="scores-table">
-            <thead>
-              <tr>
-                <th>Quiz</th>
-                <th>Score</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {scores.map((score) => (
-                <tr key={score._id}>
-                  <td>{score.quiz.title}</td>
-                  <td>
-                    {score.score}/{score.total}
-                  </td>
-                  <td>{new Date(score.createdAt).toLocaleDateString()}</td>
+        <div className="quizzes-section">
+          <h2>Available Quizzes</h2>
+          <div className="quiz-list">
+            {quizzes.map((quiz) => (
+              <div key={quiz._id} className="quiz-card">
+                <h3>{quiz.title}</h3>
+                <p>{quiz.questions.length} questions</p>
+                <Link to={`/quiz/${quiz._id}`} className="btn btn-primary">
+                  Start Quiz
+                </Link>
+                {user?.role === "admin" && (
+                  <button
+                    onClick={() => handleDeleteQuiz(quiz._id)}
+                    className="btn btn-danger"
+                    style={{ marginLeft: "10px" }}
+                  >
+                    Delete
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="scores-section">
+          <h2>Your Scores</h2>
+          {scores.length > 0 ? (
+            <table className="scores-table">
+              <thead>
+                <tr>
+                  <th>Quiz</th>
+                  <th>Score</th>
+                  <th>Date</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <p>No quiz results yet. Take a quiz to see your scores here!</p>
+              </thead>
+              <tbody>
+                {scores.map((score) => (
+                  <tr key={score._id}>
+                    <td>{score.quiz.title}</td>
+                    <td>
+                      {score.score}/{score.total}
+                    </td>
+                    <td>{new Date(score.createdAt).toLocaleDateString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <p>No quiz results yet. Take a quiz to see your scores here!</p>
+          )}
+        </div>
+
+        {user?.role === "admin" && (
+          <div className="admin-section">
+            <h2>Admin Actions</h2>
+            <Link to="/quiz/new" className="btn btn-primary">
+              Create New Quiz
+            </Link>
+          </div>
         )}
       </div>
-
-      {user?.role === "admin" && (
-        <div className="admin-section">
-          <h2>Admin Actions</h2>
-          <Link to="/quiz/new" className="btn btn-primary">
-            Create New Quiz
-          </Link>
-        </div>
-      )}
     </div>
   );
 }
