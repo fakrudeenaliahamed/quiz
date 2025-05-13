@@ -206,6 +206,9 @@ app.get("/api/quizzes/:id", authenticate, async (req, res) => {
 });
 
 app.post("/api/quizzes", authenticate, isAdmin, async (req, res) => {
+  const session = await mongoose.startSession(); // Start a session for the transaction
+  session.startTransaction(); // Start the transaction
+
   try {
     const { title, description, category, questions } = req.body;
 
@@ -215,12 +218,13 @@ app.post("/api/quizzes", authenticate, isAdmin, async (req, res) => {
     }
 
     // Check if a quiz with the same title already exists
-    let quiz = await Quiz.findOne({ title });
+    let quiz = await Quiz.findOne({ title }).session(session);
 
     if (quiz) {
       // If the quiz exists, append new questions
       quiz.questions.push(...questions);
-      await quiz.save();
+      await quiz.save({ session });
+      await session.commitTransaction(); // Commit the transaction
       return res.json({
         message: "Questions appended to the existing quiz",
         quiz,
@@ -237,10 +241,14 @@ app.post("/api/quizzes", authenticate, isAdmin, async (req, res) => {
       authorizedUsers: req.body.authorizedUsers || [],
     });
 
-    await quiz.save();
+    await quiz.save({ session });
+    await session.commitTransaction(); // Commit the transaction
     res.status(201).json({ message: "New quiz created successfully", quiz });
   } catch (err) {
+    await session.abortTransaction(); // Roll back the transaction on error
     res.status(500).json({ error: err.message });
+  } finally {
+    session.endSession(); // End the session
   }
 });
 
