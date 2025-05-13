@@ -19,34 +19,51 @@ function Dashboard() {
     }
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [quizzesRes, scoresRes] = await Promise.all([
-          axios.get("/api/quizzes"),
-          axios.get("/api/scores"),
-        ]);
+  const fetchData = async () => {
+    try {
+      const [quizzesRes, scoresRes] = await Promise.all([
+        axios.get("/api/quizzes"),
+        axios.get("/api/scores"),
+      ]);
 
-        let allQuizzes = quizzesRes.data;
+      let allQuizzes = quizzesRes.data;
 
-        // Filter quizzes based on user role
-        if (user?.role !== "admin") {
-          allQuizzes = allQuizzes.filter((quiz) =>
-            quiz.authorizedUsers.includes(user.username)
-          );
-        }
-
-        setQuizzes(allQuizzes);
-        setScores(scoresRes.data);
-      } catch (err) {
-        console.error("Failed to fetch data", err);
-      } finally {
-        setLoading(false);
+      // Filter quizzes based on user role
+      if (user?.role !== "admin") {
+        allQuizzes = allQuizzes.filter((quiz) =>
+          quiz.authorizedUsers.includes(user.username)
+        );
       }
-    };
 
+      setQuizzes(allQuizzes);
+      setScores(scoresRes.data);
+    } catch (err) {
+      console.error("Failed to fetch data", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchData();
   }, [user]);
+
+  const handleDeleteQuiz = async (quizId) => {
+    if (
+      window.confirm(
+        "Are you sure you want to delete this quiz and its related scores?"
+      )
+    ) {
+      try {
+        await axios.delete(`/api/quizzes/${quizId}`);
+        alert("Quiz and related scores deleted successfully.");
+        fetchData(); // Refresh the data after deletion
+      } catch (err) {
+        console.error("Failed to delete quiz", err);
+        alert("Failed to delete quiz. Please try again.");
+      }
+    }
+  };
 
   if (loading) return <div>Loading dashboard...</div>;
 
@@ -69,6 +86,15 @@ function Dashboard() {
               <Link to={`/quiz/${quiz._id}`} className="btn btn-primary">
                 Start Quiz
               </Link>
+              {user?.role === "admin" && (
+                <button
+                  onClick={() => handleDeleteQuiz(quiz._id)}
+                  className="btn btn-danger"
+                  style={{ marginLeft: "10px" }}
+                >
+                  Delete
+                </button>
+              )}
             </div>
           ))}
         </div>

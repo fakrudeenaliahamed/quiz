@@ -91,20 +91,31 @@ function QuizNew() {
     console.log("Parsed Data:", parsedData);
 
     try {
-      if (parsedData._id) {
-        // If _id exists, append new questions to the existing quiz
-        const response = await axios.put(`/api/quizzes/${parsedData._id}`, {
-          questions: parsedData.questions,
+      // Check if a quiz with the same title already exists
+      const existingQuiz = quizzes.find(
+        (quiz) => quiz.title === parsedData.title
+      );
+
+      if (existingQuiz) {
+        // If the quiz exists, append new questions to the existing quiz
+        const response = await axios.put(`/api/quizzes/${existingQuiz._id}`, {
+          questions: [...existingQuiz.questions, ...parsedData.questions],
         });
         console.log("Quiz updated:", response.data);
+        alert("Questions appended to the existing quiz.");
       } else {
-        // If _id does not exist, create a new quiz
+        // If the quiz does not exist, create a new quiz
         const response = await axios.post("/api/quizzes", {
           ...parsedData,
           createdBy: user._id,
         });
         console.log("Quiz created:", response.data);
+        alert("New quiz created successfully.");
       }
+
+      // Refresh the quizzes list and navigate back to the dashboard
+      const updatedQuizzes = await axios.get("/api/quizzes");
+      setQuizzes(updatedQuizzes.data);
       navigate("/dashboard");
     } catch (err) {
       setError(err.response?.data?.error || "Failed to create or update quiz");
