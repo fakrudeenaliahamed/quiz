@@ -7,6 +7,9 @@ import Navbar from "../components/Navbar";
 function Dashboard() {
   const { user, logout } = useAuth();
   const [quizzes, setQuizzes] = useState([]);
+  const [filteredQuizzes, setFilteredQuizzes] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("All");
   const [scores, setScores] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -36,7 +39,15 @@ function Dashboard() {
         );
       }
 
+      // Extract unique categories
+      const uniqueCategories = [
+        "All",
+        ...new Set(allQuizzes.map((quiz) => quiz.category)),
+      ];
+
       setQuizzes(allQuizzes);
+      setFilteredQuizzes(allQuizzes);
+      setCategories(uniqueCategories);
       setScores(scoresRes.data);
     } catch (err) {
       console.error("Failed to fetch data", err);
@@ -66,6 +77,17 @@ function Dashboard() {
     }
   };
 
+  const handleCategoryChange = (e) => {
+    const category = e.target.value;
+    setSelectedCategory(category);
+
+    if (category === "All") {
+      setFilteredQuizzes(quizzes);
+    } else {
+      setFilteredQuizzes(quizzes.filter((quiz) => quiz.category === category));
+    }
+  };
+
   if (loading) return <div>Loading dashboard...</div>;
 
   return (
@@ -81,26 +103,60 @@ function Dashboard() {
 
         <div className="quizzes-section">
           <h2>Available Quizzes</h2>
-          <div className="quiz-list">
-            {quizzes.map((quiz) => (
-              <div key={quiz._id} className="quiz-card">
-                <h3>{quiz.title}</h3>
-                <p>{quiz.questions.length} questions</p>
-                <Link to={`/quiz/${quiz._id}`} className="btn btn-primary">
-                  Start Quiz
-                </Link>
-                {user?.role === "admin" && (
-                  <button
-                    onClick={() => handleDeleteQuiz(quiz._id)}
-                    className="btn btn-danger"
-                    style={{ marginLeft: "10px" }}
-                  >
-                    Delete
-                  </button>
-                )}
-              </div>
-            ))}
+
+          {/* Category Filter Dropdown */}
+          <div className="filter-section">
+            <label htmlFor="categoryFilter">Filter by Category: </label>
+            <select
+              id="categoryFilter"
+              value={selectedCategory}
+              onChange={handleCategoryChange}
+            >
+              {categories.map((category, index) => (
+                <option key={index} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
           </div>
+
+          {/* Quizzes Table */}
+          <table className="quiz-table">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Questions</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredQuizzes.map((quiz) => (
+                <tr key={quiz._id}>
+                  <td>{quiz.title}</td>
+                  <td>{quiz.category}</td>
+                  <td>{quiz.questions.length}</td>
+                  <td>
+                    <Link
+                      to={`/quiz/${quiz._id}`}
+                      className="btn btn-primary"
+                      style={{ marginRight: "10px" }}
+                    >
+                      Start Quiz
+                    </Link>
+                    {user?.role === "admin" && (
+                      <button
+                        onClick={() => handleDeleteQuiz(quiz._id)}
+                        className="btn btn-danger"
+                      >
+                        Delete
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
 
         <div className="scores-section">
