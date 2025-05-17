@@ -46,6 +46,10 @@ function Quiz() {
 
         setQuiz(quizData);
         setFilteredQuestions(quizData.questions);
+        setCurrentQuestion(0); // Reset to the first question
+        setSelectedAnswers([]); // Clear previous answers
+        setScore(0); // Reset score
+        setCompleted(false); // Reset completion state
       } catch (err) {
         console.error("Failed to fetch quiz", err);
       }
