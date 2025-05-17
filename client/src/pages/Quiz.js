@@ -16,6 +16,7 @@ function Quiz() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [quiz, setQuiz] = useState(null);
+  const [quizList, setQuizList] = useState([]); // List of all quizzes
   const [filteredQuestions, setFilteredQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState([]);
@@ -49,7 +50,18 @@ function Quiz() {
         console.error("Failed to fetch quiz", err);
       }
     };
+
+    const fetchQuizList = async () => {
+      try {
+        const response = await axios.get("/api/quizzes");
+        setQuizList(response.data);
+      } catch (err) {
+        console.error("Failed to fetch quiz list", err);
+      }
+    };
+
     fetchQuiz();
+    fetchQuizList();
   }, [id]);
 
   const handleAnswerSelect = (answer) => {
@@ -101,6 +113,13 @@ function Quiz() {
   if (!quiz) return <div>Loading quiz...</div>;
 
   if (completed) {
+    // Find the next quiz in the list
+    const currentQuizIndex = quizList.findIndex((q) => q._id === quiz._id);
+    const nextQuiz =
+      currentQuizIndex !== -1 && currentQuizIndex + 1 < quizList.length
+        ? quizList[currentQuizIndex + 1]
+        : null;
+
     return (
       <div className="quiz-results">
         <h2>Quiz Completed!</h2>
@@ -110,6 +129,31 @@ function Quiz() {
         <button onClick={submitQuiz} className="btn btn-primary">
           Save Results
         </button>
+        <button
+          onClick={() => {
+            // Reset state to retake the quiz
+            setCurrentQuestion(0);
+            setSelectedAnswers([]);
+            setScore(0);
+            setCompleted(false);
+          }}
+          className="btn btn-secondary"
+          style={{ marginLeft: "10px" }}
+        >
+          Retake Quiz
+        </button>
+        {nextQuiz && (
+          <div style={{ marginTop: "20px" }}>
+            <h3>Suggested Next Quiz:</h3>
+            <p>{nextQuiz.title}</p>
+            <button
+              onClick={() => navigate(`/quiz/${nextQuiz._id}`)}
+              className="btn btn-success"
+            >
+              Take Next Quiz
+            </button>
+          </div>
+        )}
       </div>
     );
   }
