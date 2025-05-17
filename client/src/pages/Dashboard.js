@@ -77,6 +77,21 @@ function Dashboard() {
     }
   };
 
+  const handleClearResults = async () => {
+    if (
+      window.confirm("Are you sure you want to clear all your saved results?")
+    ) {
+      try {
+        await axios.delete("/api/scores"); // Assuming this endpoint clears all scores for the logged-in user
+        alert("All saved results have been cleared.");
+        fetchData(); // Refresh the data after clearing results
+      } catch (err) {
+        console.error("Failed to clear results", err);
+        alert("Failed to clear results. Please try again.");
+      }
+    }
+  };
+
   const handleCategoryChange = (e) => {
     const category = e.target.value;
     setSelectedCategory(category);
@@ -162,26 +177,35 @@ function Dashboard() {
         <div className="scores-section">
           <h2>Your Scores</h2>
           {scores.length > 0 ? (
-            <table className="scores-table">
-              <thead>
-                <tr>
-                  <th>Quiz</th>
-                  <th>Score</th>
-                  <th>Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {scores.map((score) => (
-                  <tr key={score._id}>
-                    <td>{score.quiz.title}</td>
-                    <td>
-                      {score.score}/{score.total}
-                    </td>
-                    <td>{new Date(score.createdAt).toLocaleDateString()}</td>
+            <>
+              <button
+                onClick={handleClearResults}
+                className="btn btn-danger"
+                style={{ marginBottom: "10px" }}
+              >
+                Clear All Results
+              </button>
+              <table className="scores-table">
+                <thead>
+                  <tr>
+                    <th>Quiz</th>
+                    <th>Score</th>
+                    <th>Date</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {scores.map((score) => (
+                    <tr key={score._id}>
+                      <td>{score.quiz.title}</td>
+                      <td>
+                        {score.score}/{score.total}
+                      </td>
+                      <td>{new Date(score.createdAt).toLocaleDateString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </>
           ) : (
             <p>No quiz results yet. Take a quiz to see your scores here!</p>
           )}

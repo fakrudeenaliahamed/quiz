@@ -366,6 +366,15 @@ app.post("/api/scores", authenticate, async (req, res) => {
   }
 });
 
+app.delete("/api/scores", authenticate, async (req, res) => {
+  try {
+    await Score.deleteMany({ user: req.user._id }); // Delete all scores for the logged-in user
+    res.json({ message: "All scores cleared successfully." });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Admin Routes
 app.get("/api/admin/users", authenticate, isAdmin, async (req, res) => {
   try {
