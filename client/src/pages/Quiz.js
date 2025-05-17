@@ -151,7 +151,23 @@ function Quiz() {
             <h3>Suggested Next Quiz:</h3>
             <p>{nextQuiz.title}</p>
             <button
-              onClick={() => navigate(`/quiz/${nextQuiz._id}`)}
+              onClick={async () => {
+                try {
+                  // Save the current quiz results
+                  await axios.post("/api/scores", {
+                    quizId: quiz._id,
+                    score,
+                    total: filteredQuestions.length,
+                    answers: selectedAnswers,
+                  });
+
+                  // Navigate to the next quiz
+                  navigate(`/quiz/${nextQuiz._id}`);
+                } catch (err) {
+                  console.error("Failed to save quiz results", err);
+                  alert("Failed to save the current quiz. Please try again.");
+                }
+              }}
               className="btn btn-success"
             >
               Take Next Quiz
