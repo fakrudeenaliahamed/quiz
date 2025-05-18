@@ -40,9 +40,10 @@
 
 /* Quiz Form Styles */
 .quiz-form {
-  max-width: 800px;
-  margin: 0 auto;
+  max-width: 900px; /* Increase the max width */
+  margin: 0 auto; /* Center align the form */
   padding: 20px;
+  text-align: center; /* Center-align the content */
 }
 
 .form-group {
@@ -56,13 +57,15 @@
 }
 
 .form-group textarea {
-  width: 100%;
+  width: 100%; /* Make the textarea take full width of the form */
+  max-width: 850px; /* Set a maximum width for the textarea */
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
   min-height: 300px;
   font-family: monospace;
   white-space: pre;
+  margin: 0 auto; /* Center-align the textarea */
 }
 
 /* Shared Alert/Feedback Styles */
