@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Navbar from "../components/Navbar";
+import ReactMarkdown from "react-markdown";
 
 const shuffleArray = (array) => {
   const shuffled = [...array];
@@ -197,7 +198,10 @@ function Quiz() {
           Question {currentQuestion + 1} of {filteredQuestions.length}
         </div>
         <div className="question">
-          <h3>{question.questionText}</h3>
+          {/* Render question text with Markdown */}
+          <h3>
+            <ReactMarkdown>{question.questionText}</ReactMarkdown>
+          </h3>
           <div className="options">
             {question.options.map((option, index) => (
               <div
@@ -236,7 +240,12 @@ function Quiz() {
                 The correct answer is: <strong>{correctAnswer}</strong>
               </p>
             )}
-            <p>{question.explanation || "No explanation provided."}</p>
+            {/* Render explanation with Markdown */}
+            <p>
+              <ReactMarkdown>
+                {question.explanation || "No explanation provided."}
+              </ReactMarkdown>
+            </p>
           </div>
         )}
 
