@@ -217,3 +217,15 @@
 .navbar-link:hover {
   text-decoration: underline;
 }
+
+/* Limit width and wrap for markdown content in quiz */
+.quiz-container .question h3,
+.quiz-container .question .react-markdown,
+.quiz-container .question pre,
+.quiz-container .question code {
+  max-width: 100%;
+  word-break: break-word;
+  white-space: pre-wrap;
+  overflow-x: auto;
+  box-sizing: border-box;
+}
