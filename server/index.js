@@ -229,7 +229,7 @@ app.get("/api/quizzes/:id", authenticate, async (req, res) => {
   }
 });
 
-app.post("/api/quizzes", authenticate, isAdmin, async (req, res) => {
+app.post("/api/quizzes", authenticate, async (req, res) => {
   try {
     const { title, description, category, questions } = req.body;
 

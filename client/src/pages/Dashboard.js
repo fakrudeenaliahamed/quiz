@@ -32,13 +32,13 @@ function Dashboard() {
 
       let allQuizzes = quizzesRes.data;
 
-      // Filter quizzes based on user role
-      if (user?.role !== "admin") {
-        allQuizzes = allQuizzes.filter((quiz) =>
-          quiz.authorizedUsers.includes(user.username)
-        );
-      }
-
+      allQuizzes = allQuizzes.filter(
+        (quiz) =>
+          quiz.createdBy &&
+          (quiz.createdBy.username === user.username || // when populated
+            quiz.createdBy === user.id || // fallback: raw ObjectId as string
+            quiz.createdBy === user._id) // fallback: raw ObjectId as string
+      );
       // Extract unique categories
       const uniqueCategories = [
         "All",
@@ -159,14 +159,12 @@ function Dashboard() {
                     >
                       Start Quiz
                     </Link>
-                    {user?.role === "admin" && (
-                      <button
-                        onClick={() => handleDeleteQuiz(quiz._id)}
-                        className="btn btn-danger"
-                      >
-                        Delete
-                      </button>
-                    )}
+                    <button
+                      onClick={() => handleDeleteQuiz(quiz._id)}
+                      className="btn btn-danger"
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -211,14 +209,12 @@ function Dashboard() {
           )}
         </div>
 
-        {user?.role === "admin" && (
-          <div className="admin-section">
-            <h2>Admin Actions</h2>
-            <Link to="/quiz/new" className="btn btn-primary">
-              Create New Quiz
-            </Link>
-          </div>
-        )}
+        <div className="admin-section">
+          <h2>Admin Actions</h2>
+          <Link to="/quiz/new" className="btn btn-primary">
+            Create New Quiz
+          </Link>
+        </div>
       </div>
     </div>
   );
