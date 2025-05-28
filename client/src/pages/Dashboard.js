@@ -35,9 +35,9 @@ function Dashboard() {
       allQuizzes = allQuizzes.filter(
         (quiz) =>
           quiz.createdBy &&
-          (quiz.createdBy.username === user.username || // when populated
-            quiz.createdBy === user.id || // fallback: raw ObjectId as string
-            quiz.createdBy === user._id) // fallback: raw ObjectId as string
+          (quiz.createdBy.username === user.username ||
+            String(quiz.createdBy._id) === String(user._id) ||
+            String(quiz.createdBy._id) === String(user.id))
       );
       // Extract unique categories
       const uniqueCategories = [
