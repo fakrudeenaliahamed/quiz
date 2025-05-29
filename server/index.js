@@ -294,7 +294,7 @@ app.put("/api/quizzes/:id", authenticate, isAdmin, async (req, res) => {
   }
 });
 
-app.delete("/api/quizzes/:id", authenticate, isAdmin, async (req, res) => {
+app.delete("/api/quizzes/:id", authenticate, async (req, res) => {
   try {
     const { id } = req.params;
 
