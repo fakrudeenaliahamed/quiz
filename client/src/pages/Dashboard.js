@@ -159,14 +159,12 @@ function Dashboard() {
                     >
                       Start Quiz
                     </Link>
-                    {user?.role === "admin" && (
-                      <button
-                        onClick={() => handleDeleteQuiz(quiz._id)}
-                        className="btn btn-danger"
-                      >
-                        Delete
-                      </button>
-                    )}
+                    <button
+                      onClick={() => handleDeleteQuiz(quiz._id)}
+                      className="btn btn-danger"
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
               ))}
