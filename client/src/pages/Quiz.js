@@ -32,12 +32,14 @@ function Quiz() {
         const response = await axios.get(`/api/quizzes/${id}`);
         const quizData = response.data;
 
+        // Shuffle all questions
+        if (quizData.questions && quizData.questions.length > 0) {
+          quizData.questions = shuffleArray(quizData.questions);
+        }
+
         // If there are more than 20 questions, select 20 random ones
         if (quizData.questions && quizData.questions.length > 20) {
-          const shuffled = [...quizData.questions].sort(
-            () => 0.5 - Math.random()
-          );
-          quizData.questions = shuffled.slice(0, 20);
+          quizData.questions = quizData.questions.slice(0, 20);
         }
 
         // Shuffle options for each question
