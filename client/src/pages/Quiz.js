@@ -60,7 +60,7 @@ function Quiz() {
         repeatedQuestions = shuffleArray(repeatedQuestions);
 
         setQuiz(quizData);
-        setFilteredQuestions(quizData.questions);
+        setFilteredQuestions(repeatedQuestions);
         setCurrentQuestion(0); // Reset to the first question
         setSelectedAnswers([]); // Clear previous answers
         setScore(0); // Reset score
@@ -161,7 +161,27 @@ function Quiz() {
         </button>
         <button
           onClick={() => {
-            // Reset state to retake the quiz
+            // Find failed questions
+            const failedQuestions = filteredQuestions.filter(
+              (question, idx) => selectedAnswers[idx] !== question.correctAnswer
+            );
+            // If all correct, just reset as usual
+            const questionsToRetake =
+              failedQuestions.length > 0 ? failedQuestions : filteredQuestions;
+
+            // Repeat each failed question 4 times and shuffle
+            let repeatedQuestions = [];
+            questionsToRetake.forEach((q) => {
+              for (let i = 0; i < 4; i++) {
+                repeatedQuestions.push({
+                  ...q,
+                  options: [...q.options],
+                });
+              }
+            });
+            repeatedQuestions = shuffleArray(repeatedQuestions);
+
+            setFilteredQuestions(repeatedQuestions);
             setCurrentQuestion(0);
             setSelectedAnswers([]);
             setScore(0);
