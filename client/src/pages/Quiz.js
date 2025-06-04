@@ -47,6 +47,18 @@ function Quiz() {
           question.options = shuffleArray(question.options);
         });
 
+        // Repeat each question 4 times and shuffle
+        let repeatedQuestions = [];
+        quizData.questions.forEach((q) => {
+          for (let i = 0; i < 4; i++) {
+            repeatedQuestions.push({
+              ...q,
+              options: [...q.options], // clone options to avoid reference issues
+            });
+          }
+        });
+        repeatedQuestions = shuffleArray(repeatedQuestions);
+
         setQuiz(quizData);
         setFilteredQuestions(quizData.questions);
         setCurrentQuestion(0); // Reset to the first question
