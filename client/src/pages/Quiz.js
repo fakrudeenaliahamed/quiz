@@ -47,20 +47,9 @@ function Quiz() {
           question.options = shuffleArray(question.options);
         });
 
-        // Repeat each question 4 times and shuffle
-        let repeatedQuestions = [];
-        quizData.questions.forEach((q) => {
-          for (let i = 0; i < 4; i++) {
-            repeatedQuestions.push({
-              ...q,
-              options: [...q.options], // clone options to avoid reference issues
-            });
-          }
-        });
-        repeatedQuestions = shuffleArray(repeatedQuestions);
-
+        // On first load, do NOT repeat questions
         setQuiz(quizData);
-        setFilteredQuestions(repeatedQuestions);
+        setFilteredQuestions(quizData.questions);
         setCurrentQuestion(0); // Reset to the first question
         setSelectedAnswers([]); // Clear previous answers
         setScore(0); // Reset score
@@ -234,9 +223,9 @@ function Quiz() {
       <Navbar />
       <div className="quiz-container">
         <h2>{quiz.title}</h2>
-        {quiz.questions.length > 20 && (
+        {quiz.questions.length > 30 && (
           <div className="quiz-notice">
-            (Showing 20 random questions out of {quiz.questions.length})
+            (Showing 30 random questions out of {quiz.questions.length})
           </div>
         )}
         <div className="quiz-progress">
