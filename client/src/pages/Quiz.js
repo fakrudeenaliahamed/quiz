@@ -37,9 +37,9 @@ function Quiz() {
           quizData.questions = shuffleArray(quizData.questions);
         }
 
-        // If there are more than 20 questions, select 20 random ones
-        if (quizData.questions && quizData.questions.length > 20) {
-          quizData.questions = quizData.questions.slice(0, 20);
+        // If there are more than 30 questions, select 30 random ones
+        if (quizData.questions && quizData.questions.length > 30) {
+          quizData.questions = quizData.questions.slice(0, 30);
         }
 
         // Shuffle options for each question
@@ -127,11 +127,22 @@ function Quiz() {
         ? quizList[currentQuizIndex + 1]
         : null;
 
+    // Calculate percentage
+    const percent = (score / filteredQuestions.length) * 100;
+    const resultText = percent >= 80 ? "Passed" : "Failed";
+    const resultClass = percent >= 80 ? "passed" : "failed";
+
     return (
       <div className="quiz-results">
         <h2>Quiz Completed!</h2>
         <p>
-          Your score: {score}/{filteredQuestions.length}
+          Your score: {score}/{filteredQuestions.length} ({percent.toFixed(1)}%)
+        </p>
+        <p
+          className={resultClass}
+          style={{ fontWeight: "bold", fontSize: "1.2em" }}
+        >
+          {resultText}
         </p>
         <button onClick={submitQuiz} className="btn btn-primary">
           Save Results
