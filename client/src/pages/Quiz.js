@@ -112,7 +112,7 @@ function Quiz() {
         total: filteredQuestions.length,
         answers: selectedAnswers,
       });
-      navigate("/dashboard");
+      // Do not navigate here, let the user choose what to do next
     } catch (err) {
       console.error("Failed to submit quiz", err);
     }
@@ -145,11 +145,20 @@ function Quiz() {
         >
           {resultText}
         </p>
-        <button onClick={submitQuiz} className="btn btn-primary">
+        <button
+          onClick={async () => {
+            await submitQuiz();
+            navigate("/dashboard");
+          }}
+          className="btn btn-primary"
+        >
           Save Results
         </button>
         <button
-          onClick={() => {
+          onClick={async () => {
+            // Save the current quiz results before resetting
+            await submitQuiz();
+
             // Find failed questions
             const failedQuestions = filteredQuestions.filter(
               (question, idx) => selectedAnswers[idx] !== question.correctAnswer
@@ -189,13 +198,7 @@ function Quiz() {
               onClick={async () => {
                 try {
                   // Save the current quiz results
-                  await axios.post("/api/scores", {
-                    quizId: quiz._id,
-                    score,
-                    total: filteredQuestions.length,
-                    answers: selectedAnswers,
-                  });
-
+                  await submitQuiz();
                   // Navigate to the next quiz
                   navigate(`/quiz/${nextQuiz._id}`);
                 } catch (err) {
