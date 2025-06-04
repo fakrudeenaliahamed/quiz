@@ -17,7 +17,7 @@ function Quiz() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [quiz, setQuiz] = useState(null);
-  const [quizList, setQuizList] = useState([]); // List of all quizzes
+  const [quizList, setQuizList] = useState([]);
   const [filteredQuestions, setFilteredQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState([]);
@@ -47,13 +47,12 @@ function Quiz() {
           question.options = shuffleArray(question.options);
         });
 
-        // On first load, do NOT repeat questions
         setQuiz(quizData);
         setFilteredQuestions(quizData.questions);
-        setCurrentQuestion(0); // Reset to the first question
-        setSelectedAnswers([]); // Clear previous answers
-        setScore(0); // Reset score
-        setCompleted(false); // Reset completion state
+        setCurrentQuestion(0);
+        setSelectedAnswers([]);
+        setScore(0);
+        setCompleted(false);
       } catch (err) {
         console.error("Failed to fetch quiz", err);
       }
@@ -170,13 +169,13 @@ function Quiz() {
             // Shuffle failed questions before repeating
             questionsToRetake = shuffleArray(questionsToRetake);
 
-            // Repeat each failed question 4 times
+            // Repeat each failed question 4 times and shuffle options for each repeat
             let repeatedQuestions = [];
             questionsToRetake.forEach((q) => {
               for (let i = 0; i < 4; i++) {
                 repeatedQuestions.push({
                   ...q,
-                  options: shuffleArray([...q.options]), // shuffle options for each repeat
+                  options: shuffleArray([...q.options]),
                 });
               }
             });
@@ -202,9 +201,7 @@ function Quiz() {
             <button
               onClick={async () => {
                 try {
-                  // Save the current quiz results
                   await submitQuiz();
-                  // Navigate to the next quiz
                   navigate(`/quiz/${nextQuiz._id}`);
                 } catch (err) {
                   console.error("Failed to save quiz results", err);
@@ -240,7 +237,6 @@ function Quiz() {
           Question {currentQuestion + 1} of {filteredQuestions.length}
         </div>
         <div className="question">
-          {/* Render question text with Markdown */}
           <h3>
             <ReactMarkdown>{question.questionText}</ReactMarkdown>
           </h3>
@@ -264,41 +260,40 @@ function Quiz() {
                 {option}
                 {showFeedback && option === correctAnswer && (
                   <span className="correct-marker"> (Correct Answer)</span>
-                )}
+                )} )}
               </div>
             ))}
           </div>
         </div>
 
-        {showFeedback && (
+        {showFeedback && (edback && (
           <div
-            className={`feedback ${
-              lastAnswerCorrect ? "correct" : "incorrect"
+            className={`feedback ${assName={`feedback ${
+              lastAnswerCorrect ? "correct" : "incorrect"              lastAnswerCorrect ? "correct" : "incorrect"
             }`}
           >
-            <p>{lastAnswerCorrect ? "✓ Correct!" : "✗ Incorrect"}</p>
+            <p>{lastAnswerCorrect ? "✓ Correct!" : "✗ Incorrect"}</p> "✓ Correct!" : "✗ Incorrect"}</p>
             {!lastAnswerCorrect && (
-              <p>
-              <ReactMarkdown>nswer is: <strong>{correctAnswer}</strong>
+              <p>p>
+                The correct answer is: <strong>{correctAnswer}</strong>     The correct answer is: <strong>{correctAnswer}</strong>
+              </p>
+            )}
+            <p>
+              <ReactMarkdown>
                 {question.explanation || "No explanation provided."}
               </ReactMarkdown>
-            </p>Render explanation with Markdown */}
+            </p>
           </div>
-        )}    <ReactMarkdown>
-                {question.explanation || "No explanation provided."}
+        )}
+
         {hasSelectedAnswer && (
           <button onClick={handleNext} className="btn btn-primary">
             {currentQuestion === filteredQuestions.length - 1
               ? "Finish Quiz"
               : "Next Question"}
-          </button>dAnswer && (
-        )}<button onClick={handleNext} className="btn btn-primary">
-      </div>{currentQuestion === filteredQuestions.length - 1
-    </div>    ? "Finish Quiz"
-  );          : "Next Question"}
-}         </button>
+          </button>
         )}
-export default Quiz;
+      </div>
     </div>
   );
 }
