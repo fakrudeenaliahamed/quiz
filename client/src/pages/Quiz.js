@@ -160,23 +160,28 @@ function Quiz() {
             await submitQuiz();
 
             // Find failed questions
-            const failedQuestions = filteredQuestions.filter(
+            let failedQuestions = filteredQuestions.filter(
               (question, idx) => selectedAnswers[idx] !== question.correctAnswer
             );
             // If all correct, just reset as usual
-            const questionsToRetake =
+            let questionsToRetake =
               failedQuestions.length > 0 ? failedQuestions : filteredQuestions;
 
-            // Repeat each failed question 4 times and shuffle
+            // Shuffle failed questions before repeating
+            questionsToRetake = shuffleArray(questionsToRetake);
+
+            // Repeat each failed question 4 times
             let repeatedQuestions = [];
             questionsToRetake.forEach((q) => {
               for (let i = 0; i < 4; i++) {
                 repeatedQuestions.push({
                   ...q,
-                  options: [...q.options],
+                  options: shuffleArray([...q.options]), // shuffle options for each repeat
                 });
               }
             });
+
+            // Shuffle the repeated questions again for extra randomness
             repeatedQuestions = shuffleArray(repeatedQuestions);
 
             setFilteredQuestions(repeatedQuestions);
@@ -274,26 +279,26 @@ function Quiz() {
             <p>{lastAnswerCorrect ? "✓ Correct!" : "✗ Incorrect"}</p>
             {!lastAnswerCorrect && (
               <p>
-                The correct answer is: <strong>{correctAnswer}</strong>
-              </p>
-            )}
-            {/* Render explanation with Markdown */}
-            <p>
-              <ReactMarkdown>
+              <ReactMarkdown>nswer is: <strong>{correctAnswer}</strong>
                 {question.explanation || "No explanation provided."}
               </ReactMarkdown>
-            </p>
+            </p>Render explanation with Markdown */}
           </div>
-        )}
-
+        )}    <ReactMarkdown>
+                {question.explanation || "No explanation provided."}
         {hasSelectedAnswer && (
           <button onClick={handleNext} className="btn btn-primary">
             {currentQuestion === filteredQuestions.length - 1
               ? "Finish Quiz"
               : "Next Question"}
-          </button>
+          </button>dAnswer && (
+        )}<button onClick={handleNext} className="btn btn-primary">
+      </div>{currentQuestion === filteredQuestions.length - 1
+    </div>    ? "Finish Quiz"
+  );          : "Next Question"}
+}         </button>
         )}
-      </div>
+export default Quiz;
     </div>
   );
 }
