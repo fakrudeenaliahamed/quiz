@@ -260,22 +260,22 @@ function Quiz() {
                 {option}
                 {showFeedback && option === correctAnswer && (
                   <span className="correct-marker"> (Correct Answer)</span>
-                )} )}
+                )}
               </div>
             ))}
           </div>
         </div>
 
-        {showFeedback && (edback && (
+        {showFeedback && (
           <div
-            className={`feedback ${assName={`feedback ${
-              lastAnswerCorrect ? "correct" : "incorrect"              lastAnswerCorrect ? "correct" : "incorrect"
+            className={`feedback ${
+              lastAnswerCorrect ? "correct" : "incorrect"
             }`}
           >
-            <p>{lastAnswerCorrect ? "✓ Correct!" : "✗ Incorrect"}</p> "✓ Correct!" : "✗ Incorrect"}</p>
+            <p>{lastAnswerCorrect ? "✓ Correct!" : "✗ Incorrect"}</p>
             {!lastAnswerCorrect && (
-              <p>p>
-                The correct answer is: <strong>{correctAnswer}</strong>     The correct answer is: <strong>{correctAnswer}</strong>
+              <p>
+                The correct answer is: <strong>{correctAnswer}</strong>
               </p>
             )}
             <p>
