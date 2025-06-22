@@ -295,22 +295,19 @@ app.put("/api/quizzes/:id", authenticate, isAdmin, async (req, res) => {
 });
 
 app.delete("/api/quizzes/:id", authenticate, async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    // Delete the quiz
-    const quiz = await Quiz.findByIdAndDelete(id);
-    if (!quiz) {
-      return res.status(404).json({ error: "Quiz not found" });
-    }
-
-    // Delete related scores
-    await Score.deleteMany({ quiz: id });
-
-    res.json({ message: "Quiz and related scores deleted successfully" });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  // try {
+  //   const { id } = req.params;
+  //   // Delete the quiz
+  //   const quiz = await Quiz.findByIdAndDelete(id);
+  //   if (!quiz) {
+  //     return res.status(404).json({ error: "Quiz not found" });
+  //   }
+  //   // Delete related scores
+  //   await Score.deleteMany({ quiz: id });
+  //   res.json({ message: "Quiz and related scores deleted successfully" });
+  // } catch (err) {
+  //   res.status(500).json({ error: err.message });
+  // }
 });
 
 // Score Routes
