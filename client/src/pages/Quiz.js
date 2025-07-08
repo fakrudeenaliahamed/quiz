@@ -237,20 +237,27 @@ function Quiz() {
           Question {currentQuestion + 1} of {filteredQuestions.length}
         </div>
         <div className="question">
+          {/* Horizontal border before originalQuestionSource */}
+          <hr style={{ margin: "10px 0" }} />
           {question.originalQuestionSource && (
             <div
               style={{
                 marginBottom: "8px",
                 fontSize: "0.98em",
-                color: "#555",
+                color: "#1976d2", // blue color
+                fontWeight: "bold", // make it bold
               }}
             >
               <ReactMarkdown>{question.originalQuestionSource}</ReactMarkdown>
             </div>
           )}
+          {/* Horizontal border after originalQuestionSource and before questionText */}
+          <hr style={{ margin: "10px 0" }} />
           <h3>
             <ReactMarkdown>{question.questionText}</ReactMarkdown>
           </h3>
+          {/* Horizontal border after questionText */}
+          <hr style={{ margin: "10px 0" }} />
           <div className="options">
             {question.options.map((option, index) => (
               <div
