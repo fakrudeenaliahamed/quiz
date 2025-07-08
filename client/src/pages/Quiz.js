@@ -237,6 +237,17 @@ function Quiz() {
           Question {currentQuestion + 1} of {filteredQuestions.length}
         </div>
         <div className="question">
+          {question.originalQuestionSource && (
+            <div
+              style={{
+                marginBottom: "8px",
+                fontSize: "0.98em",
+                color: "#555",
+              }}
+            >
+              <ReactMarkdown>{question.originalQuestionSource}</ReactMarkdown>
+            </div>
+          )}
           <h3>
             <ReactMarkdown>{question.questionText}</ReactMarkdown>
           </h3>

@@ -60,11 +60,12 @@ const Quiz = mongoose.model(
         correctAnswer: { type: String, required: true },
         points: { type: Number, default: 1 },
         explanation: String,
+        originalQuestionSource: String, // <-- Add this line
       },
     ],
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     createdAt: { type: Date, default: Date.now },
-    authorizedUsers: [{ type: String }], // Array of usernames
+    authorizedUsers: [{ type: String }],
   })
 );
 

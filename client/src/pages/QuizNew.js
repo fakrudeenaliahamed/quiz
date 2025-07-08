@@ -61,6 +61,9 @@ function QuizNew() {
         ) {
           throw new Error("correctAnswer must match one of the options");
         }
+        if (!("originalQuestionSource" in question)) {
+          throw new Error("Each question must have originalQuestionSource");
+        }
       }
 
       setParsedData(data);
@@ -173,6 +176,17 @@ function QuizNew() {
                       <strong>Q{i + 1}:</strong> {q.questionText} (
                       {q.points || 1} point{q.points !== 1 ? "s" : ""})
                     </p>
+                    {q.originalQuestionSource && (
+                      <div
+                        style={{
+                          fontSize: "0.95em",
+                          color: "#555",
+                          marginBottom: "4px",
+                        }}
+                      >
+                        <strong>Source:</strong> {q.originalQuestionSource}
+                      </div>
+                    )}
                     <ul>
                       {q.options.map((opt, j) => (
                         <li
