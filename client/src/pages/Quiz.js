@@ -253,9 +253,16 @@ function Quiz() {
           )}
           {/* Horizontal border after originalQuestionSource and before questionText */}
           <hr style={{ margin: "10px 0" }} />
-          <h3>
-            <ReactMarkdown break-lines>{question.questionText}</ReactMarkdown>
-          </h3>
+          <div
+            style={{
+              marginBottom: "8px",
+              fontSize: "0.98em",
+              color: "#1976d2", // blue color
+              fontWeight: "bold", // make it bold
+            }}
+          >
+            <ReactMarkdown>{question.questionText}</ReactMarkdown>
+          </div>
           {/* Horizontal border after questionText */}
           <hr style={{ margin: "10px 0" }} />
           <div className="options">

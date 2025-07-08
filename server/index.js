@@ -271,7 +271,7 @@ app.post("/api/quizzes", authenticate, async (req, res) => {
   }
 });
 
-app.put("/api/quizzes/:id", authenticate, isAdmin, async (req, res) => {
+app.put("/api/quizzes/:id", authenticate, async (req, res) => {
   try {
     const { id } = req.params;
     const { questions } = req.body;
