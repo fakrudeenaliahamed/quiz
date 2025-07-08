@@ -254,7 +254,7 @@ function Quiz() {
           {/* Horizontal border after originalQuestionSource and before questionText */}
           <hr style={{ margin: "10px 0" }} />
           <h3>
-            <ReactMarkdown>{question.questionText}</ReactMarkdown>
+            <ReactMarkdown break-lines>{question.questionText}</ReactMarkdown>
           </h3>
           {/* Horizontal border after questionText */}
           <hr style={{ margin: "10px 0" }} />
