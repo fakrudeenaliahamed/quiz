@@ -259,10 +259,17 @@ function Quiz() {
             <form
               onSubmit={async (e) => {
                 e.preventDefault();
+                let parsed;
+                try {
+                  parsed = JSON.parse(editContent.json);
+                } catch (err) {
+                  alert("Invalid JSON");
+                  return;
+                }
                 // Call backend API to update question
                 await axios.put(
                   `/api/quizzes/${quiz._id}/questions/${question._id}`,
-                  editContent
+                  parsed
                 );
                 // Refresh quiz data
                 const response = await axios.get(`/api/quizzes/${quiz._id}`);
@@ -273,59 +280,14 @@ function Quiz() {
               style={{ marginBottom: "10px" }}
             >
               <div>
-                <label>Question Text:</label>
+                <label>Edit Question JSON:</label>
                 <textarea
-                  value={editContent.questionText}
+                  value={editContent.json}
                   onChange={(e) =>
-                    setEditContent({
-                      ...editContent,
-                      questionText: e.target.value,
-                    })
+                    setEditContent({ ...editContent, json: e.target.value })
                   }
-                  rows={3}
-                  style={{ width: "100%" }}
-                />
-              </div>
-              <div>
-                <label>Original Question Source:</label>
-                <input
-                  type="text"
-                  value={editContent.originalQuestionSource}
-                  onChange={(e) =>
-                    setEditContent({
-                      ...editContent,
-                      originalQuestionSource: e.target.value,
-                    })
-                  }
-                  style={{ width: "100%" }}
-                />
-              </div>
-              <div>
-                <label>Options (comma separated):</label>
-                <input
-                  type="text"
-                  value={editContent.options}
-                  onChange={(e) =>
-                    setEditContent({
-                      ...editContent,
-                      options: e.target.value,
-                    })
-                  }
-                  style={{ width: "100%" }}
-                />
-              </div>
-              <div>
-                <label>Correct Answer:</label>
-                <input
-                  type="text"
-                  value={editContent.correctAnswer}
-                  onChange={(e) =>
-                    setEditContent({
-                      ...editContent,
-                      correctAnswer: e.target.value,
-                    })
-                  }
-                  style={{ width: "100%" }}
+                  rows={10}
+                  style={{ width: "100%", fontFamily: "monospace" }}
                 />
               </div>
               <button
@@ -361,11 +323,19 @@ function Quiz() {
                 style={{ marginBottom: 8 }}
                 onClick={() => {
                   setEditContent({
-                    questionText: question.questionText,
-                    originalQuestionSource:
-                      question.originalQuestionSource || "",
-                    options: question.options.join(","),
-                    correctAnswer: question.correctAnswer,
+                    json: JSON.stringify(
+                      {
+                        questionText: question.questionText,
+                        originalQuestionSource:
+                          question.originalQuestionSource || "",
+                        options: question.options,
+                        correctAnswer: question.correctAnswer,
+                        explanation: question.explanation || "",
+                        points: question.points || 1,
+                      },
+                      null,
+                      2
+                    ),
                   });
                   setEditing(true);
                 }}
