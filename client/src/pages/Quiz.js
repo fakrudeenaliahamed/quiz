@@ -25,6 +25,8 @@ function Quiz() {
   const [completed, setCompleted] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
   const [lastAnswerCorrect, setLastAnswerCorrect] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [editContent, setEditContent] = useState({});
 
   useEffect(() => {
     const fetchQuiz = async () => {
@@ -237,33 +239,141 @@ function Quiz() {
           Question {currentQuestion + 1} of {filteredQuestions.length}
         </div>
         <div className="question">
-          {/* Horizontal border before originalQuestionSource */}
           <hr style={{ margin: "10px 0" }} />
           {question.originalQuestionSource && (
             <div
               style={{
                 marginBottom: "8px",
                 fontSize: "0.98em",
-                color: "#1976d2", // blue color
-                fontWeight: "bold", // make it bold
+                color: "#1976d2",
+                fontWeight: "bold",
               }}
             >
               <ReactMarkdown>{question.originalQuestionSource}</ReactMarkdown>
             </div>
           )}
-          {/* Horizontal border after originalQuestionSource and before questionText */}
           <hr style={{ margin: "10px 0" }} />
-          <div
-            style={{
-              marginBottom: "8px",
-              fontSize: "0.98em",
-              color: "#1976d2", // blue color
-              fontWeight: "bold", // make it bold
-            }}
-          >
-            <ReactMarkdown>{question.questionText}</ReactMarkdown>
-          </div>
-          {/* Horizontal border after questionText */}
+
+          {/* Edit Mode */}
+          {editing ? (
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                // Call backend API to update question
+                await axios.put(
+                  `/api/quizzes/${quiz._id}/questions/${question._id}`,
+                  editContent
+                );
+                // Refresh quiz data
+                const response = await axios.get(`/api/quizzes/${quiz._id}`);
+                setQuiz(response.data);
+                setFilteredQuestions(response.data.questions);
+                setEditing(false);
+              }}
+              style={{ marginBottom: "10px" }}
+            >
+              <div>
+                <label>Question Text:</label>
+                <textarea
+                  value={editContent.questionText}
+                  onChange={(e) =>
+                    setEditContent({
+                      ...editContent,
+                      questionText: e.target.value,
+                    })
+                  }
+                  rows={3}
+                  style={{ width: "100%" }}
+                />
+              </div>
+              <div>
+                <label>Original Question Source:</label>
+                <input
+                  type="text"
+                  value={editContent.originalQuestionSource}
+                  onChange={(e) =>
+                    setEditContent({
+                      ...editContent,
+                      originalQuestionSource: e.target.value,
+                    })
+                  }
+                  style={{ width: "100%" }}
+                />
+              </div>
+              <div>
+                <label>Options (comma separated):</label>
+                <input
+                  type="text"
+                  value={editContent.options}
+                  onChange={(e) =>
+                    setEditContent({
+                      ...editContent,
+                      options: e.target.value,
+                    })
+                  }
+                  style={{ width: "100%" }}
+                />
+              </div>
+              <div>
+                <label>Correct Answer:</label>
+                <input
+                  type="text"
+                  value={editContent.correctAnswer}
+                  onChange={(e) =>
+                    setEditContent({
+                      ...editContent,
+                      correctAnswer: e.target.value,
+                    })
+                  }
+                  style={{ width: "100%" }}
+                />
+              </div>
+              <button
+                type="submit"
+                className="btn btn-success"
+                style={{ marginTop: 8 }}
+              >
+                Save
+              </button>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                style={{ marginLeft: 8, marginTop: 8 }}
+                onClick={() => setEditing(false)}
+              >
+                Cancel
+              </button>
+            </form>
+          ) : (
+            <>
+              <div
+                style={{
+                  marginBottom: "8px",
+                  fontSize: "0.98em",
+                  color: "#1976d2",
+                  fontWeight: "bold",
+                }}
+              >
+                <ReactMarkdown>{question.questionText}</ReactMarkdown>
+              </div>
+              <button
+                className="btn btn-warning"
+                style={{ marginBottom: 8 }}
+                onClick={() => {
+                  setEditContent({
+                    questionText: question.questionText,
+                    originalQuestionSource:
+                      question.originalQuestionSource || "",
+                    options: question.options.join(","),
+                    correctAnswer: question.correctAnswer,
+                  });
+                  setEditing(true);
+                }}
+              >
+                Edit Question
+              </button>
+            </>
+          )}
           <hr style={{ margin: "10px 0" }} />
           <div className="options">
             {question.options.map((option, index) => (

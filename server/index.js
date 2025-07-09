@@ -454,3 +454,35 @@ app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
   await initializeAdmin();
 });
+
+// Edit a specific question in a quiz by question ID
+app.put(
+  "/api/quizzes/:quizId/questions/:questionId",
+  authenticate,
+  async (req, res) => {
+    try {
+      const { quizId, questionId } = req.params;
+      const updatedFields = req.body; // Should contain only the fields to update
+
+      const quiz = await Quiz.findById(quizId);
+      if (!quiz) {
+        return res.status(404).json({ error: "Quiz not found" });
+      }
+
+      const question = quiz.questions.id(questionId);
+      if (!question) {
+        return res.status(404).json({ error: "Question not found" });
+      }
+
+      // Update fields
+      Object.keys(updatedFields).forEach((key) => {
+        question[key] = updatedFields[key];
+      });
+
+      await quiz.save();
+      res.json({ message: "Question updated successfully", question });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  }
+);
