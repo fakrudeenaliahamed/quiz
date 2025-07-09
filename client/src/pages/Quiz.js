@@ -273,6 +273,12 @@ function Quiz() {
                 );
                 // Refresh quiz data
                 const response = await axios.get(`/api/quizzes/${quiz._id}`);
+
+                // Shuffle options for each question
+                response.data.questions.forEach((q) => {
+                  q.options = shuffleArray(q.options);
+                });
+
                 setQuiz(response.data);
                 setFilteredQuestions(response.data.questions);
                 setEditing(false);
